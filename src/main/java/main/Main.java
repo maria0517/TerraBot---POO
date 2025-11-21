@@ -355,7 +355,7 @@ public final class Main {
                 if (comanda.getCommand().equals("startSimulation")) {
                     // a inceput simularea
                     if (beginSim) {
-                        // Eroare - simularea a început deja
+                        // error - simularea a inceput deja
                         ObjectNode eroare = MAPPER.createObjectNode();
                         eroare.putArray("ERROR: Simulation already started. Cannot perform action");
                         output.add(eroare);
@@ -395,7 +395,7 @@ public final class Main {
                 }
                 // pentru schimbari meteo
                 // cand dispare fenomenul meteo???
-                if (timeWeatherChange != 0 && timeWeatherChange + 1 <= comanda.getTimestamp()) {
+                if (timeWeatherChange != 0 && timeWeatherChange + 2 <= comanda.getTimestamp()) {
                     // le fac cu formula default scorurile la aer
                     // doar pentru 2 iteratii tin conditiile meteo
                     // mai intai "debifez true de la weathercond"
