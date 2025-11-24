@@ -10,6 +10,7 @@ public abstract class Animal extends Entity {
     private double intakeRate = 0.08;
 
     private boolean mutareOk = true;
+    private int foodType = 0;
 
     // constructorul animalului
     public Animal(String type, String name, double mass, String state) {
@@ -36,7 +37,7 @@ public abstract class Animal extends Entity {
 
     // asta e generala pentru toata lumea
     // vreau sa returnez noua pozitie pe care ar avea o noul animal
-    public int[] move(Map mapaCurenta, int x, int y) {
+    public int[] move(MapA mapaCurenta, int x, int y) {
         // actually, pe asta o apelez pentru un animal scanat
         // fac eu astea din map
         // aici o sa am un animal caruia ii voi gasi patratica pe care vrea sa se mute;
@@ -47,8 +48,8 @@ public abstract class Animal extends Entity {
         int yNew = 0;
         // TREBUIE SA FIE SCANATE
         if (mapaCurenta.verifCell(x, y + 1) && mapaCurenta.getCell(x, y + 1).getPlant() != null
-        && mapaCurenta.getCell(x, y + 1).getWater() != null && mapaCurenta.getCell(x, y + 1).getScannedPlant()
-        && mapaCurenta.getCell(x, y + 1).getScannedWater()) { // incep si eu cu dreapta
+                && mapaCurenta.getCell(x, y + 1).getWater() != null && mapaCurenta.getCell(x, y + 1).getScannedPlant()
+                && mapaCurenta.getCell(x, y + 1).getScannedWater()) { // incep si eu cu dreapta
             // am si apa si planta undeva
             // vad daca e maxim
             double apaScor = mapaCurenta.getCell(x, y + 1).getWater().waterQualityCalc();
@@ -59,8 +60,8 @@ public abstract class Animal extends Entity {
             }
         }
         if (mapaCurenta.verifCell(x + 1, y) && mapaCurenta.getCell(x + 1, y).getPlant() != null
-        && mapaCurenta.getCell(x + 1, y).getWater() != null && mapaCurenta.getCell(x + 1, y).getScannedWater()
-        && mapaCurenta.getCell(x + 1, y).getScannedPlant()) { // jos
+                && mapaCurenta.getCell(x + 1, y).getWater() != null && mapaCurenta.getCell(x + 1, y).getScannedWater()
+                && mapaCurenta.getCell(x + 1, y).getScannedPlant()) { // jos
             // am si apa si planta undeva
             // vad daca e maxim
             double apaScor = mapaCurenta.getCell(x + 1,y).getWater().waterQualityCalc();
@@ -71,8 +72,8 @@ public abstract class Animal extends Entity {
             }
         }
         if (mapaCurenta.verifCell(x, y - 1) && mapaCurenta.getCell(x, y - 1).getPlant() != null
-        && mapaCurenta.getCell(x, y - 1).getWater() != null && mapaCurenta.getCell(x, y -1).getScannedWater()
-        && mapaCurenta.getCell(x, y - 1).getScannedPlant()) { // stnaga
+                && mapaCurenta.getCell(x, y - 1).getWater() != null && mapaCurenta.getCell(x, y -1).getScannedWater()
+                && mapaCurenta.getCell(x, y - 1).getScannedPlant()) { // stnaga
             // am si apa si planta undeva
             // vad daca e maxim
             double apaScor = mapaCurenta.getCell(x,y - 1).getWater().waterQualityCalc();
@@ -83,8 +84,8 @@ public abstract class Animal extends Entity {
             }
         }
         if (mapaCurenta.verifCell(x - 1, y) && mapaCurenta.getCell(x - 1, y).getPlant() != null
-        && mapaCurenta.getCell(x - 1, y).getWater() != null && mapaCurenta.getCell(x - 1, y).getScannedWater()
-        && mapaCurenta.getCell(x - 1, y).getScannedPlant()) { // si aici sus
+                && mapaCurenta.getCell(x - 1, y).getWater() != null && mapaCurenta.getCell(x - 1, y).getScannedWater()
+                && mapaCurenta.getCell(x - 1, y).getScannedPlant()) { // si aici sus
             // am si apa si planta undeva
             // vad daca e maxim
             double apaScor = mapaCurenta.getCell(x - 1,y).getWater().waterQualityCalc();
@@ -101,26 +102,26 @@ public abstract class Animal extends Entity {
         } else {
             // n am gasit, vad unde este doar planta ; tot logica de la robot
             if (mapaCurenta.verifCell(x, y + 1) && mapaCurenta.getCell(x, y + 1).getPlant() != null
-            && mapaCurenta.getCell(x, y + 1).getScannedPlant())
+                    && mapaCurenta.getCell(x, y + 1).getScannedPlant())
                 return new int[]{x, y + 1};
 
             if (mapaCurenta.verifCell(x + 1, y) && mapaCurenta.getCell(x + 1, y).getPlant() != null
-            && mapaCurenta.getCell(x + 1, y).getScannedPlant())
-              return new int[]{x + 1, y};
+                    && mapaCurenta.getCell(x + 1, y).getScannedPlant())
+                return new int[]{x + 1, y};
 
             if (mapaCurenta.verifCell(x, y - 1) && mapaCurenta.getCell(x, y - 1).getPlant() != null &&
-            mapaCurenta.getCell(x, y - 1).getScannedPlant())
+                    mapaCurenta.getCell(x, y - 1).getScannedPlant())
                 return new int[]{x, y - 1};
 
             if (mapaCurenta.verifCell(x - 1, y) && mapaCurenta.getCell(x - 1, y).getPlant() != null
-            && mapaCurenta.getCell(x - 1, y).getScannedPlant())
+                    && mapaCurenta.getCell(x - 1, y).getScannedPlant())
                 return new int[]{x - 1, y};
 
             //  daca am ajuns pana aici inseamna ca nu e nicio planta
             // ma duc pe apa ; am tot maxQualWater -1
 
             if (mapaCurenta.verifCell(x, y + 1) && mapaCurenta.getCell(x, y + 1).getWater() != null &&
-            mapaCurenta.getCell(x, y + 1).getScannedWater()) {
+                    mapaCurenta.getCell(x, y + 1).getScannedWater()) {
                 double apaScor =  mapaCurenta.getCell(x,y + 1).getWater().waterQualityCalc();
                 if (apaScor > maxQualWater) {
                     maxQualWater = apaScor;
@@ -129,7 +130,7 @@ public abstract class Animal extends Entity {
                 }
             }
             if (mapaCurenta.verifCell(x, y - 1) && mapaCurenta.getCell(x, y - 1).getWater() != null &&
-            mapaCurenta.getCell(x, y - 1).getScannedWater()) {
+                    mapaCurenta.getCell(x, y - 1).getScannedWater()) {
                 double apaScor =  mapaCurenta.getCell(x,y - 1).getWater().waterQualityCalc();
                 if (apaScor > maxQualWater) {
                     maxQualWater = apaScor;
@@ -138,7 +139,7 @@ public abstract class Animal extends Entity {
                 }
             }
             if (mapaCurenta.verifCell(x - 1, y) && mapaCurenta.getCell(x - 1, y).getWater() != null &&
-            mapaCurenta.getCell(x - 1, y).getScannedWater()) {
+                    mapaCurenta.getCell(x - 1, y).getScannedWater()) {
                 double apaScor =  mapaCurenta.getCell(x - 1,y).getWater().waterQualityCalc();
                 if (apaScor > maxQualWater) {
                     maxQualWater = apaScor;
@@ -147,7 +148,7 @@ public abstract class Animal extends Entity {
                 }
             }
             if (mapaCurenta.verifCell(x + 1, y) && mapaCurenta.getCell(x + 1, y).getWater() != null &&
-            mapaCurenta.getCell(x + 1, y).getScannedWater()) {
+                    mapaCurenta.getCell(x + 1, y).getScannedWater()) {
                 double apaScor =  mapaCurenta.getCell(x + 1,y).getWater().waterQualityCalc();
                 if (apaScor > maxQualWater) {
                     maxQualWater = apaScor;
@@ -177,6 +178,8 @@ public abstract class Animal extends Entity {
     // asta depinde de animal
     public abstract double attackProbability();
 
+    // public abstract void eat();
+
     @Override
     public double getMass() {
         return super.getMass();
@@ -197,4 +200,8 @@ public abstract class Animal extends Entity {
     public void setMutareOk(boolean mutareOk) {
         this.mutareOk = mutareOk;
     }
+
+    public void setFoodType(int foodType) { this.foodType = foodType; }
+
+    public int getFoodType() { return foodType; }
 }

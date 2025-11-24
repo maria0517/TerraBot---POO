@@ -14,6 +14,7 @@ import Entities.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The entry point to this homework. It runs the checker that tests your implementation.
@@ -48,7 +49,7 @@ public final class Main {
             int height = Integer.parseInt(dims[1]);
             int energyPoints = simulare.getEnergyPoints();
 
-            Map mapaCurenta = new Map(width, height, energyPoints);
+            MapA mapaCurenta = new MapA(width, height, energyPoints);
 
             // acum am mapa, trebuie sa o populez acum
             var parametri = simulare.getTerritorySectionParams();
@@ -303,9 +304,10 @@ public final class Main {
             // acum incep sa vad comenzile
 
             ArrayList<CommandInput> allComs = inputLoader.getCommands();
-            // int timestamp = 1; no more needed
+
             int timeLoadStart = 1;
             int timeToRecharge = 0;
+            int lastProcessedTimestamp = 0;
             // momentan amicu nu e la incarcat
             boolean isCharging = false;
             boolean beginSim = false;
@@ -392,6 +394,7 @@ public final class Main {
                 // se poate folosi
                 if (timeLoadStart + timeToRecharge <= comanda.getTimestamp()) {
                     isCharging = false;
+                    timeToRecharge = 0;
                 }
                 // pentru schimbari meteo
                 // cand dispare fenomenul meteo???
@@ -403,13 +406,24 @@ public final class Main {
                     // recalc la toata lumea -> de fiecare cand fol aer calculez efectiv
                     // mapaCurenta.recalcAir(weatherType);
                 }
+                // dintr o simulare de a mea
+                // fac toate interactiunile cu care sunt restanta
+                // mai ales daca am un recharge
+                if (beginSim && !endSim) {
+                    for (int timestamp = lastProcessedTimestamp + 1; timestamp <= comanda.getTimestamp(); timestamp++) {
+                        mapaCurenta.interc1time(timestamp);
+                        mapaCurenta.interc2time(timestamp); // asta doar la apa =)
+                        mapaCurenta.intercAnimal(timestamp);
+                    }
+                }
+                // actualizez noul lastProcessed
+                lastProcessedTimestamp = comanda.getTimestamp();
+
                 // preiau comenzi daca nu a inceput o simulare
                 // si daca robotelul nu este la incarcat
                 if (beginSim && !endSim && !isCharging) {
-
-                    // aici trebuie sa pun cele care se mod independent de orice
-                    mapaCurenta.interc1time(comanda.getTimestamp());
-                    mapaCurenta.interc2time(comanda.getTimestamp()); // asta doar la apa =)
+                    // aici trebuie sa pun toate interact care se mod independent de orice
+                    // le fac mai sus sus pentru toata lumea
 
                     // aici sunt in timpul simularii
                     if (comanda.getCommand().equals("printEnvConditions")) {
@@ -520,7 +534,7 @@ public final class Main {
                         // preiau atributele
                         if (amicu.getEnergyPoints() - 7 < 0) {
                             // nu am puncte sa mai scanez -> eroare mare
-
+                            // !!!!!!! NU E SCRIS AICI !!!!!!
                         } else {
                             String color = comanda.getColor();
                             String smell = comanda.getSmell();
@@ -603,6 +617,157 @@ public final class Main {
                             }
                         }
                     }
+                    if (comanda.getCommand().equals("learnFact")) {
+                        // acum trebuie mai intai sa verific daca am baterie pentru treaba asta
+                        ObjectNode eroare = MAPPER.createObjectNode();
+                        if (amicu.getEnergyPoints() < 2) {
+                            // nu pot face miscarea
+                            eroare.put("command", comanda.getCommand());
+                            eroare.put("message", "ERROR: Not enough battery left. Cannot perform action");
+                            eroare.put("timestamp", comanda.getTimestamp());
+                            output.add(eroare);
+                        } else {
+                            // vad ce subiect am si ma uit sa vad daca l am scanat
+                            String component = comanda.getComponents();
+
+                            boolean gasit = false;
+                            for (Entity e : amicu.getScannedEntities()) {
+                                if (e.getName().equals(component))
+                                    gasit = true;
+
+                            }
+                            if (!gasit) {
+                                // n am scanat inca factu pe care vreau sa l pun
+                                // eroare
+                                eroare.put("command", comanda.getCommand());
+                                eroare.put("message", "ERROR: Subject not yet saved. Cannot perform action");
+                                eroare.put("timestamp", comanda.getTimestamp());
+                                output.add(eroare);
+                            } else {
+                                // am tot ce imi trebuie, scriu in database
+                                String subject = comanda.getSubject();
+                                amicu.addFact(component, subject);
+                                // scad punctele de energie
+                                amicu.setEnergyPoints(amicu.getEnergyPoints() - 2);
+                                ObjectNode result = MAPPER.createObjectNode();
+                                result.put("command", comanda.getCommand());
+                                result.put("message", "The fact has been successfully saved in the database.");
+                                result.put("timestamp", comanda.getTimestamp());
+                                output.add(result);
+                            }
+                        }
+                    }
+                    if (comanda.getCommand().equals("improveEnvironment")) {
+                        ObjectNode eroare = MAPPER.createObjectNode();
+                        eroare.put("command", comanda.getCommand());
+                        if (amicu.getEnergyPoints() < 10) {
+                            eroare.put("message", "ERROR: Not enough battery left. Cannot perform action");
+                            eroare.put("timestamp", comanda.getTimestamp());
+                            output.add(eroare);
+                        } else {
+                            // trebuie sa vad ce trebuie sa caut in baza de date
+                            String elemToAdd = comanda.getName();
+                            // imi trebuie cand adaug
+                            String type = comanda.getType();
+                            String improvementType = comanda.getImprovementType();
+                            Entity entityToAdd = null;
+
+                            boolean gasit = false;
+                            for (Entity e : amicu.getScannedEntities()) {
+                                if (e.getName().equals(elemToAdd)) {
+                                    gasit = true;
+                                    entityToAdd = e;
+                                }
+                            }
+                            // daca n am gasit elem in cele scanate -> dau eroare
+                            if (!gasit) {
+                                eroare.put("message", "ERROR: Subject not yet saved. Cannot perform action");
+                                eroare.put("timestamp", comanda.getTimestamp());
+                                output.add(eroare);
+                            } else {
+                                // acum il vad daca il am in facst
+                                // trebuie formatat
+                                String requiredFact = "";
+                                switch (improvementType) {
+                                    case "plantVegetation":
+                                        requiredFact = "Method to plant " + elemToAdd;
+                                        break;
+                                    case "fertilizeSoil":
+                                        requiredFact = "Method to fertilize soil with " + elemToAdd;
+                                        break;
+                                    case "increaseHumidity":
+                                        requiredFact = "Method to increase humidity with " + elemToAdd;
+                                        break;
+                                    case "increaseMoisture":
+                                        requiredFact = "Method to increaseMoisture";
+                                        break;
+                                }
+
+                                boolean factGasit = false;
+                                // acum ca am formatul cerut, incep sa caut
+                                // Parcurge toate faptele din baza de date
+                                List<String> factsForSubject = amicu.getFacts(elemToAdd);
+                                if (factsForSubject != null) {
+                                    for (String fact : factsForSubject) {
+                                        if (fact.equals(requiredFact))
+                                            factGasit = true;
+                                    }
+                                }
+
+                                System.out.println("Exista asta sau nu: " + factGasit + "ce am cautat: " + requiredFact);
+
+                                if (!factGasit) {
+                                    // n am gasit facts pentru jucarie
+                                    // eroare
+                                    eroare.put("message", "ERROR: Fact not yet saved. Cannot perform action");
+                                    eroare.put("timestamp", comanda.getTimestamp());
+                                    output.add(eroare);
+                                } else {
+                                    // am tot ce trebuie
+                                    // scad energia
+                                    amicu.setEnergyPoints(amicu.getEnergyPoints() - 10);
+
+                                    // dau mesajul
+
+                                    ObjectNode result = MAPPER.createObjectNode();
+                                    result.put("command", comanda.getCommand());
+                                    // aici mai adaug in functie de teste
+                                    if (improvementType.equals("plantVegetation")) {
+                                        result.put("message", "The " + elemToAdd + " was planted successfully.");
+                                        // mapaCurenta.getCell(amicu.getX(), amicu.getY()).setAddPlant(true);
+                                    }
+                                    if (improvementType.equals("fertilizeSoil")) {
+                                        result.put("message", "The soil was successfully fertilized using "+ elemToAdd + ".");
+                                        // mapaCurenta.getCell(amicu.getX(), amicu.getY()).setAddAnimal(true);
+                                    }
+                                    if (improvementType.equals("increaseHumidity")) {
+                                        result.put("message", "The humidity was successfully increased using " + elemToAdd + ".");
+                                        // mapaCurenta.getCell(amicu.getX(), amicu.getY()).setAddWater(true);
+                                    }
+                                    if (improvementType.equals("increaseMoisture")) {
+                                        result.put("message", "The moisture was successfully increased using " + elemToAdd );
+                                        // mapaCurenta.getCell(amicu.getX(), amicu.getY()).setAddWater(true);
+                                    }
+                                    result.put("timestamp", comanda.getTimestamp());
+                                    output.add(result);
+
+                                    // aici imbunatatirea; urmeaza
+                                    // o fac fix in celula respectiva
+                                    mapaCurenta.getCell(amicu.getX(), amicu.getY()).applyImprov(improvementType, entityToAdd, type);
+                                }
+                            }
+                        }
+                    }
+                    if (comanda.getCommand().equals("printKnowledgeBase")) {
+                        // trebuie printat ce am
+                        ObjectNode result = MAPPER.createObjectNode();
+                        result.put("command", comanda.getCommand());
+                        // acum trebuie sa iau tot
+                        result.set("output", amicu.getKnowledgeBase(MAPPER));
+                        result.put("timestamp", comanda.getTimestamp());
+                        output.add(result);
+
+                    }
                 } else {
                     // nu s a pornit simularea sau a fost inchisa
                     if (!beginSim) {
@@ -643,7 +808,7 @@ public final class Main {
 
                     }
                 }
-                System.out.println("DUpa timestamp: " + comanda.getTimestamp() + " robotu are: " + amicu.getEnergyPoints());
+                // System.out.println("DUpa timestamp: " + comanda.getTimestamp() + " robotu are: " + amicu.getEnergyPoints());
                 // timestamp++;
             }
             /*

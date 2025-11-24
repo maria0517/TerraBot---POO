@@ -2,62 +2,68 @@ package Map;
 
 
 import Entities.Entity;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class Robot {
-	private int x;
-	private int y;
-	private double energyPoints;
-	private boolean isCharging;
+    private int x;
+    private int y;
+    private double energyPoints;
+    private boolean isCharging;
 
     // lista in care retin entitatile scanate
     private List<Entity> scannedEntities;
 
-	// constructor robot
-	public Robot(int x, int y, double energyPoints) {
-		this.x = x;
-		this.y = y;
-		this.energyPoints = energyPoints;
+    // HashMap pentru fapte: cheia = subiect, valoarea = lista de fapte
+    private Map<String, List<String>> factsDatabase;
+
+    // constructor robot
+    public Robot(int x, int y, double energyPoints) {
+        this.x = x;
+        this.y = y;
+        this.energyPoints = energyPoints;
 
         // init la lista
         scannedEntities = new ArrayList<>();
-	}
+        factsDatabase = new LinkedHashMap<>(); // fol linked ca sa pastrez ordinea
+    }
 
-	// getteri setteri la toata lumea
-	public void setX(int x) {
-		this.x = x;
-	}
+    // getteri setteri la toata lumea
+    public void setX(int x) {
+        this.x = x;
+    }
 
-	public void setY(int y) {
-		this.y = y;
-	}
+    public void setY(int y) {
+        this.y = y;
+    }
 
-	public void setEnergyPoints(double energyPoints) {
-		this.energyPoints = energyPoints;
-	}
+    public void setEnergyPoints(double energyPoints) {
+        this.energyPoints = energyPoints;
+    }
 
-	public int getX() {
-		return this.x;
-	}
+    public int getX() {
+        return this.x;
+    }
 
-	public int getY() {
-		return this.y;
-	}
+    public int getY() {
+        return this.y;
+    }
 
-	public double getEnergyPoints() {
-		return this.energyPoints;
-	}
+    public double getEnergyPoints() {
+        return this.energyPoints;
+    }
 
-	public String moveRobot(Map mapaEfec) {
+    public String moveRobot(MapA mapaEfec) {
         int min = 10000;
         double scor = 0;
         int nrBadEntities = 0;
         int nrPatratica = 0;
 
-        System.out.println("ma mut de la " + this.getX() + " " + this.getY() + " " +
-                energyPoints);
+        // System.out.println("ma mut de la " + this.getX() + " " + this.getY() + " " +
+        // energyPoints);
 
         if (mapaEfec.verifCell(x, y + 1)) { // dreapta
             // dreapta care e dreapta
@@ -127,7 +133,7 @@ public class Robot {
             if (nrPatratica == 4) {
                 this.y = y - 1;
             }
-            System.out.println("ajung pe " + x + " " + y + " cu costul: " + min);
+            // System.out.println("ajung pe " + x + " " + y + " cu costul: " + min);
             return "The robot has successfully moved to position (" + this.x + ", " + this.y + ").";
         }
         // daca am ajuns aici ori nu pot sa ma mut ori n am baterie
@@ -137,5 +143,39 @@ public class Robot {
     public void addScanObj(Entity elem_scanat) {
         // adaug elem
         scannedEntities.add(elem_scanat);
+    }
+
+    // getter pentru lista de entitati scanate
+    public List<Entity> getScannedEntities() {
+        return scannedEntities;
+    }
+
+    // adauga un fact in knowledge
+    public void addFact(String subject, String fact) {
+        factsDatabase.putIfAbsent(subject, new ArrayList<>());
+        factsDatabase.get(subject).add(fact);
+    }
+
+    // getter pentru fapte
+    public List<String> getFacts(String subject) {
+        return factsDatabase.getOrDefault(subject, new ArrayList<>());
+    }
+
+    public ArrayNode getKnowledgeBase(ObjectMapper mapper) {
+        ArrayNode outputArray = mapper.createArrayNode();
+
+        for (Map.Entry<String, List<String>> entry : this.factsDatabase.entrySet()) {
+            ObjectNode topicNode = mapper.createObjectNode();
+            topicNode.put("topic", entry.getKey());
+
+            ArrayNode factsArray = mapper.createArrayNode();
+            for (String fact : entry.getValue()) {
+                factsArray.add(fact);
+            }
+            topicNode.set("facts", factsArray);
+            outputArray.add(topicNode);
+        }
+
+        return outputArray;
     }
 }

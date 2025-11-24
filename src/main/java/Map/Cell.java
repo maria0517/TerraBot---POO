@@ -137,6 +137,33 @@ public class Cell {
         return cellInfo;
     }
 
+    public void applyImprov(String improvmentType, Entity elemToAdd, String type) {
+        // Aplică îmbunătățirile corespunzătoare
+        if (improvmentType.equals("plantVegetation")) {
+            // pentru planta -> o adaug in celula
+            //  this.plant = (Plant) elemToAdd;
+            // this.plant.setType(type);
+
+            // cresc nivelul de oxigen
+            this.air.setOxygenLevel(this.air.getOxygenLevel() + 0.3);
+        }
+        if (improvmentType.equals("fertilizeSoil")) {
+            // aici la animal; eu efectiv il trantesc aici??
+            // ma mai gandesc
+            // asta se face sigur
+            this.soil.setOrganicMatter(this.soil.getOrganicMatter() + 0.3);
+        }
+        if (improvmentType.equals("increaseHumidity") || improvmentType.equals("increaseMoisture")) {
+            // la apa -> adaug apa si modific ce e de mod
+            // this.water = (Water) elemToAdd;
+            // this.water.setType(type);
+            if (improvmentType.equals("increaseHumidity") && this.air != null)
+                this.air.setHumidity(this.air.getHumidity() + 0.2);
+            if (improvmentType.equals("increaseMoisture") && this.soil != null)
+                this.soil.setWaterRetention(this.soil.getWaterRetention() + 0.2);
+        }
+    }
+
     // getteri si setteri pentru entitati
 
     public int getX() { return x; }
@@ -223,6 +250,7 @@ public class Cell {
         this.startInterAnimal = startInterAnimal;
     }
 
+    // pentru debug
     @Override
     public String toString() {
         return "Cell:\n" +
