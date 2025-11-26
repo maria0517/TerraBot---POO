@@ -80,9 +80,10 @@ public class MapA {
         return mapInfo;
     }
 
-    public void setWeatherCheck(String weatherCheck, double value) {
+    public boolean setWeatherCheck(String weatherCheck, double value) {
         // pentru fiecare celula verif daca are aer de tip X
         // si il setez pe opusul sau (treu / false)
+        boolean gasitAer = false;
         for (int i = 0; i <= width - 1; i++) {
             for (int j = 0; j <= height - 1; j++) {
                 // merg din celula in celula si verific daca am
@@ -91,33 +92,41 @@ public class MapA {
                     if (mapaEfec[i][j].getAir().getType().equals("TropicalAir")) {
                         // am celula care este de tip asa
                         mapaEfec[i][j].getAir().setWeather("rainfall", value);
+                        // am gasit -> schimbare valida
+                        gasitAer = true;
                     }
                 }
                 if (weatherCheck.equals("polarStorm")) {
                     // polarAir
                     if  (mapaEfec[i][j].getAir().getType().equals("PolarAir")) {
                         mapaEfec[i][j].getAir().setWeather("polarStorm", value);
+                        gasitAer = true;
                     }
                 }
                 if (weatherCheck.equals("newSeason")) {
                     // temperat
-                    if (mapaEfec[i][j].getAir().getType().equals("TemperateAir"))
+                    if (mapaEfec[i][j].getAir().getType().equals("TemperateAir")) {
                         mapaEfec[i][j].getAir().setWeather("newSeason", value);
+                        gasitAer = true;
+                    }
                 }
                 if (weatherCheck.equals("desertStorm")) {
                     // desertaciune
                     if (mapaEfec[i][j].getAir().getType().equals("DesertAir")) {
                         mapaEfec[i][j].getAir().setWeather("desertStorm", value);
+                        gasitAer = true;
                     }
                 }
                 if (weatherCheck.equals("peopleHiking")) {
                     // munte
-                    if (mapaEfec[i][j].getAir().getType().equals("PeopleHiking")) {
+                    if (mapaEfec[i][j].getAir().getType().equals("MountainAir")) {
                         mapaEfec[i][j].getAir().setWeather("peopleHiking", value);
+                        gasitAer = true;
                     }
                 }
             }
         }
+        return gasitAer;
     }
 
     // le separ in interactiuni de 1 timestamp si de 2 timestamp
@@ -258,9 +267,10 @@ public class MapA {
                     mapaEfec[i][j].setAnimal(null);
                     mapaEfec[newCoords[0]][newCoords[1]].setAnimal(animal);
                     mapaEfec[newCoords[0]][newCoords[1]].setScannedAnimal(true);
-                    mapaEfec[i][j].setScannedWater(false);
+                    // mapaEfec[i][j].setScannedWater(false);
                     mapaEfec[newCoords[0]][newCoords[1]].setStartInterAnimal(mapaEfec[i][j].getStartInterAnimal());
                     mapaEfec[i][j].setStartInterAnimal(0);
+                    mapaEfec[i][j].setScannedAnimal(false);
                     // il setez ca nu il mai pot muta pe perioada acestui timestamp
                     mapaEfec[newCoords[0]][newCoords[1]].getAnimal().setMutareOk(false);
 
@@ -269,7 +279,7 @@ public class MapA {
                     if (preyEaten == 0) {
                         // toate animalele devin la fel; ma pun frumos sa vad ce am in celula ca sa stiu ce pot manca
                         if (mapaEfec[newCoords[0]][newCoords[1]].getPlant() != null && mapaEfec[newCoords[0]][newCoords[1]].getScannedPlant() &&
-                                mapaEfec[newCoords[0]][newCoords[1]].getWater() != null && mapaEfec[newCoords[0]][j].getScannedWater()) {
+                                mapaEfec[newCoords[0]][newCoords[1]].getWater() != null && mapaEfec[newCoords[0]][newCoords[1]].getScannedWater()) {
                             // am si apa si planta -> dezmat
                             // aici o sa bea apa si nu bea de 2 ori ca n am de unde sa i dau
                             waterDrank = 1;
@@ -287,6 +297,11 @@ public class MapA {
                             // pun noua masa
                             mapaEfec[newCoords[0]][newCoords[1]].getAnimal().setMass(mapaEfec[newCoords[0]][newCoords[1]].getPlant().getMass() + waterToDrink);
                             mapaEfec[newCoords[0]][newCoords[1]].getAnimal().setFoodType(2);
+                            // oricum ar fi la final omor plantuta
+                            // omor plantuta
+                            mapaEfec[newCoords[0]][newCoords[1]].setPlant(null);
+                            mapaEfec[newCoords[0]][newCoords[1]].setScannedPlant(false);
+                            mapaEfec[newCoords[0]][newCoords[1]].setStartInterPlant(0);
                             // trebuie sa vad daca s a terminat apa; nu stiu inca sigur
                         } else {
                             // nu prea inteleg dc vrea sa verific daca exista animalul, da lasa asa
@@ -296,14 +311,15 @@ public class MapA {
                                 // dc sa verific asta nene
                                 mapaEfec[newCoords[0]][newCoords[1]].getAnimal().setMass(mapaEfec[newCoords[0]][newCoords[1]].getPlant().getMass() + mapaEfec[newCoords[0]][newCoords[1]].getAnimal().getMass());
                                 mapaEfec[newCoords[0]][newCoords[1]].getAnimal().setFoodType(1);
+                                // oricum ar fi la final omor plantuta
+                                // omor plantuta
+                                mapaEfec[newCoords[0]][newCoords[1]].setPlant(null);
+                                mapaEfec[newCoords[0]][newCoords[1]].setScannedPlant(false);
+                                mapaEfec[newCoords[0]][newCoords[1]].setStartInterPlant(0);
                             }
                         }
                     }
-                    // oricum ar fi la final omor plantuta
-                    // omor plantuta
-                    mapaEfec[newCoords[0]][newCoords[1]].setPlant(null);
-                    mapaEfec[newCoords[0]][newCoords[1]].setScannedPlant(false);
-                    mapaEfec[newCoords[0]][newCoords[1]].setStartInterPlant(0);
+
                 }
                 // asta va fi pentru apa indiferent de ploaie vant, asta o fac mereu
                 // Animal -> Water 2.0
