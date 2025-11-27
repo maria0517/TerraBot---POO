@@ -4,7 +4,6 @@ import constants.Const;
 
 public final class Omnivores extends Animal {
     private static final double ATTACKPOS = 60;
-    // momentan nu stiu daca le trebuie ceva specific
     public Omnivores(final String type, final String name, final double mass, final String state) {
         super(type, name, mass, state);
     }

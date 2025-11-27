@@ -15,7 +15,7 @@ public abstract class Soil extends Entity {
     private double organicMatter;
     private double soilQuality;
 
-    // constructorul de baza ?? se mai pune
+    // constructorul de baza
     public Soil(final String type, final String name, final double mass, final double nitrogen,
            final double waterRetention, final double soilpH, final double organicMatter) {
         super(name, mass);

@@ -58,7 +58,7 @@ public final class Water extends Entity {
         }
     }
 
-    // intrebare pentru frozen trebuie oare setter + getter
+    // getteri setteri pentru toti
     public String getType() {
         return type;
     }
@@ -106,9 +106,6 @@ public final class Water extends Entity {
     }
     public void setTurbidity(final double turbidity) {
         this.turbidity = turbidity;
-    }
-    public void setFrozen(final boolean frozen) {
-        this.isFrozen = frozen;
     }
 
     @Override

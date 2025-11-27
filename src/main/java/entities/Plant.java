@@ -11,7 +11,6 @@ public abstract class Plant extends Entity {
     private double maturityOxigenRate = Const.DOUA_ZECIMI;
     // creste +0.2 pe la fiecare iter; toate pleaca de mici
     private double growthLevel = 0;
-    // private double scanned;
 
     // constructorul competent
     public Plant(final String type, final String name, final double mass, final String status) {
@@ -74,14 +73,6 @@ public abstract class Plant extends Entity {
             maturityOxigenRate = 0.0;
         }
         growthLevel = Math.round(growthLevel * Const.O_SUTA_DBL) / Const.O_SUTA_DBL;
-    }
-
-    /**
-     *
-     * @return levelGrowth
-     */
-    public double getGrowthLevel() {
-        return growthLevel;
     }
 
     /**

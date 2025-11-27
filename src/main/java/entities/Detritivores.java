@@ -4,7 +4,7 @@ import constants.Const;
 
 public final class Detritivores extends Animal {
     private static final double ATTACKPOS = 90;
-    // momentan nu stiu daca le trebuie ceva specific
+
     public Detritivores(final String type, final String name,
                final double mass, final String state) {
         super(type, name, mass, state);

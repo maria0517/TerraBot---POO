@@ -4,7 +4,7 @@ import constants.Const;
 
 public final class Carnivores extends Animal {
     private static final double ATTACKPOS = 30;
-    // momentan nu stiu daca le trebuie ceva specific
+    // constructor
     public Carnivores(final String type, final String name,
               final double mass, final String state) {
         super(type, name, mass, state);

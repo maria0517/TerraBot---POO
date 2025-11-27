@@ -59,7 +59,7 @@ public final class MapA {
      * @return
      */
     public boolean verifCell(final int x, final int y) {
-        // tu ti pisicii tai de egallll!!!!!!!!!!
+        // verificare coord
         if (x < 0 || x > width - 1 || y < 0 || y > height - 1) {
             return false;
         }
@@ -91,7 +91,6 @@ public final class MapA {
                         int x = section.getX();
                         int y = section.getY();
 
-                        // incep sa creez aerul
                         PolarAir air2 = new PolarAir(airInput.getType(),
                                 airInput.getName(), airInput.getMass(), airInput.getHumidity(),
                                 airInput.getTemperature(), airInput.getOxygenLevel(),
@@ -103,7 +102,6 @@ public final class MapA {
                         int x = section.getX();
                         int y = section.getY();
 
-                        // incep sa creez aerul
                         TemperateAir air3 = new TemperateAir(airInput.getType(),
                                 airInput.getName(), airInput.getMass(), airInput.getHumidity(),
                                 airInput.getTemperature(), airInput.getOxygenLevel(),
@@ -115,7 +113,6 @@ public final class MapA {
                         int x = section.getX();
                         int y = section.getY();
 
-                        // incep sa creez aerul
                         DesertAir air4 = new DesertAir(airInput.getType(),
                                 airInput.getName(), airInput.getMass(), airInput.getHumidity(),
                                 airInput.getTemperature(), airInput.getOxygenLevel(),
@@ -157,12 +154,11 @@ public final class MapA {
                     for (var section : soilInput.getSections()) {
                         int x = section.getX();
                         int y = section.getY();
-                        // creez ForestSoil cu toate prop
+
                        DesertSoil solul3 = new DesertSoil(soilInput.getType(), soilInput.getName(),
                        soilInput.getMass(), soilInput.getNitrogen(), soilInput.getWaterRetention(),
                      soilInput.getSoilpH(), soilInput.getOrganicMatter(), soilInput.getSalinity());
 
-                        // acum pun in celula
                         this.getCell(x, y).setSoil(solul3);
                     }
                 } else if ("TundraSoil".equals(soilInput.getType())) {
@@ -340,7 +336,7 @@ public final class MapA {
                 ObjectNode cellInfo = localMapper.createObjectNode();
                 Cell cell = mapaEfec[x][y];
 
-                // Section array [x, y]
+                // section array [x, y]
                 ArrayNode section = localMapper.createArrayNode();
                 section.add(x);
                 section.add(y);
@@ -354,7 +350,7 @@ public final class MapA {
                 cellInfo.put("airQuality", cell.getAir().getAirQualityString());
                 cellInfo.put("soilQuality", cell.getSoil().soilQualityString());
 
-                // adaug ce am facut mai bine
+                // adaug ce am facut
                 mapInfo.add(cellInfo);
             }
         }
@@ -436,8 +432,6 @@ public final class MapA {
                 // am scanat o aici fac si cu crescutul; e doi in unu
                 if (mapaEfec[i][j].getPlant() != null && mapaEfec[i][j].getScannedPlant()
                         && mapaEfec[i][j].getStartInterPlant() + 1 <= timestampCurent) {
-                    // am voie sa stric chestii))
-                    // System.out.println("sunt si eu aici, poate sunt bine" + timestampCurent);
                     // cresc mai intai planta
                     mapaEfec[i][j].getPlant().grow();
                     // verific daca nu s a dus
@@ -454,7 +448,6 @@ public final class MapA {
                                 / Const.O_SUTA_DBL;
                         // acum trebuie sa mod calitatea aerului
                         mapaEfec[i][j].getAir().setOxygenLevel(o2New);
-                        // si cam asta e ipotetic
                     }
 
                 }
@@ -472,7 +465,7 @@ public final class MapA {
                         mapaEfec[i][j].setStartInterPlant(0);
                     }
                 }
-                // Animal -> Soil // asta aici nu stiu daca e bine
+                // Animal -> Soil
                 if (mapaEfec[i][j].getAnimal() != null && mapaEfec[i][j].getScannedAnimal()
                         && mapaEfec[i][j].getStartInterAnimal() + 1 <= timestampCurent) {
                     // daca animalul este well-fed, produce ingrasamant
@@ -489,7 +482,6 @@ public final class MapA {
                         mapaEfec[i][j].getSoil().setOrganicMatter(newOM);
                     }
                 }
-                // Animal -> Water + Animal -> Plant le fac din hranire
             }
         }
     }
@@ -503,10 +495,10 @@ public final class MapA {
             for (int j = 0; j <= height - 1; j++) {
                 // Apa -> Aer
                 // Apa -> Sol
-                // Atentie: aici trebuie la cate 2 iteratii -> fac cu restul
+                // atentie: aici trebuie la cate 2 iteratii -> fac cu restul
                 if (mapaEfec[i][j].getWater() != null && mapaEfec[i][j].getScannedWater()
                         && mapaEfec[i][j].getStartInterWater() % 2 == timestampCurent % 2) {
-                    // acum trebuie sa vedem ce se modifica
+                    // acum trebuie sa vad ce se modifica
                     // +0.1 la waterRetention sol
                     double newWaterRet = mapaEfec[i][j].getSoil().getWaterRetention();
                     newWaterRet += Const.O_ZECIME;
@@ -546,7 +538,7 @@ public final class MapA {
                     // ma duc sa vad daca am animal de tip carnivor / parazit
                     if (mapaEfec[i][j].getAnimal().getType().equals("Carnivores")
                             || mapaEfec[i][j].getAnimal().getType().equals("Parasites")) {
-                        // trebuie sa vad cu prada care e treaba
+                        // trebuie sa vad daca am prada
                         if (mapaEfec[newCoords[0]][newCoords[1]].getAnimal() != null) {
                             // pe celula pe care vreau sa ma duc am un animal
                             Animal prey = mapaEfec[newCoords[0]][newCoords[1]].getAnimal();
@@ -565,7 +557,6 @@ public final class MapA {
                     mapaEfec[i][j].setAnimal(null);
                     mapaEfec[newCoords[0]][newCoords[1]].setAnimal(animal);
                     mapaEfec[newCoords[0]][newCoords[1]].setScannedAnimal(true);
-                    // mapaEfec[i][j].setScannedWater(false);
                     mapaEfec[newCoords[0]][newCoords[1]].setStartInterAnimal(
                             mapaEfec[i][j].getStartInterAnimal());
                     mapaEfec[i][j].setStartInterAnimal(0);
@@ -573,7 +564,7 @@ public final class MapA {
                     // il setez ca nu il mai pot muta pe perioada acestui timestamp
                     mapaEfec[newCoords[0]][newCoords[1]].getAnimal().setMutareOk(false);
 
-                    // trebuie sa si manance saracu
+                    // trebuie sa si manance
                     // nu mai trec pe aici decat doar daca nu a mancat
                     if (preyEaten == 0) {
                         // toate animalele devin la fel; ma pun frumos sa vad ce am
@@ -582,8 +573,7 @@ public final class MapA {
                             && mapaEfec[newCoords[0]][newCoords[1]].getScannedPlant()
                             && mapaEfec[newCoords[0]][newCoords[1]].getWater() != null
                            && mapaEfec[newCoords[0]][newCoords[1]].getScannedWater()) {
-                            // am si apa si planta -> dezmat
-                            // aici o sa bea apa si nu bea de 2 ori ca n am de unde sa i dau
+                            // am si apa si planta
                             waterDrank = 1;
                             // calculez cat are de baut
                             double waterToDrink = Math.min(mapaEfec[newCoords[0]][newCoords[1]]
@@ -597,7 +587,7 @@ public final class MapA {
                                 // trebuie stearsa apa
                                 mapaEfec[newCoords[0]][newCoords[1]].setWater(null);
                                 mapaEfec[newCoords[0]][newCoords[1]].setScannedWater(false);
-                                mapaEfec[newCoords[0]][newCoords[1]].setStartInterPlant(0);
+                                mapaEfec[newCoords[0]][newCoords[1]].setStartInterWater(0);
                             }
                             // pun noua masa
                             mapaEfec[newCoords[0]][newCoords[1]].getAnimal().setMass(
@@ -609,10 +599,9 @@ public final class MapA {
                             mapaEfec[newCoords[0]][newCoords[1]].setPlant(null);
                             mapaEfec[newCoords[0]][newCoords[1]].setScannedPlant(false);
                             mapaEfec[newCoords[0]][newCoords[1]].setStartInterPlant(0);
-                            // trebuie sa vad daca s a terminat apa; nu stiu inca sigur
                         } else {
                             // nu prea inteleg dc vrea sa verific daca exista animalul, da lasa asa
-                            // double-check n a omorat pe nimeni inca
+                            // dubla verificare n a omorat pe nimeni inca
                             if (mapaEfec[newCoords[0]][newCoords[1]].getPlant() != null
                                     && mapaEfec[newCoords[0]][newCoords[1]].getScannedPlant()
                                     && mapaEfec[newCoords[0]][newCoords[1]].getAnimal() != null) {
@@ -651,7 +640,7 @@ public final class MapA {
                         // trebuie stearsa apa
                         mapaEfec[i][j].setWater(null);
                         mapaEfec[i][j].setScannedWater(false);
-                        mapaEfec[i][j].setStartInterPlant(0);
+                        mapaEfec[i][j].setStartInterWater(0);
                     }
                     mapaEfec[i][j].getAnimal().setFoodType(1);
                 }

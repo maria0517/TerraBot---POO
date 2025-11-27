@@ -15,7 +15,7 @@ public abstract class Entity {
         this.mass = mass;
     }
 
-    // getter + setter pentru name
+    // getter + setter pentru name + mass
 
     /**
      *  getter nume

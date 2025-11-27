@@ -21,7 +21,7 @@ public final class Robot {
     // lista in care retin entitatile scanate
     private List<Entity> scannedEntities;
 
-    // HashMap pentru fapte: cheia = subiect, valoarea = lista de fapte
+    // HashMap pentru fapte: cheia + valoare (lista de fapte)
     private Map<String, List<String>> factsDatabase;
 
     // constructor robot
@@ -69,10 +69,7 @@ public final class Robot {
         int nrBadEntities = 0;
         int nrPatratica = 0;
 
-        // System.out.println("ma mut de la " + this.getX() + " " + this.getY() + " " +
-        // energyPoints);
-
-        if (mapaEfec.verifCell(x, y + 1)) { // dreapta
+        if (mapaEfec.verifCell(x, y + 1)) {
             // dreapta care e dreapta
             scor = mapaEfec.getCell(x, y + 1).calculateScore();
             nrBadEntities = mapaEfec.getCell(x, y + 1).calcAllEntities();
@@ -84,7 +81,7 @@ public final class Robot {
             }
         }
 
-        if (mapaEfec.verifCell(x + 1, y)) { // jos
+        if (mapaEfec.verifCell(x + 1, y)) {
             // asta e sus la mine, jos aici
             scor = mapaEfec.getCell(x + 1, y).calculateScore();
             nrBadEntities = mapaEfec.getCell(x + 1, y).calcAllEntities();
@@ -96,7 +93,7 @@ public final class Robot {
             }
         }
 
-        if (mapaEfec.verifCell(x, y - 1)) { // stanga
+        if (mapaEfec.verifCell(x, y - 1)) {
             // asta e stanga pe bune
             scor = mapaEfec.getCell(x, y - 1).calculateScore();
             nrBadEntities = mapaEfec.getCell(x, y - 1).calcAllEntities();
@@ -108,7 +105,7 @@ public final class Robot {
             }
         }
 
-        if (mapaEfec.verifCell(x - 1, y)) { // sus
+        if (mapaEfec.verifCell(x - 1, y)) {
             // asta e sus cica (la mine in cap e jos)
             scor = mapaEfec.getCell(x - 1, y).calculateScore();
             nrBadEntities = mapaEfec.getCell(x - 1, y).calcAllEntities();
@@ -140,7 +137,6 @@ public final class Robot {
             if (nrPatratica == Const.UN_PATRU) {
                 this.y = y - 1;
             }
-            // System.out.println("ajung pe " + x + " " + y + " cu costul: " + min);
             return "The robot has successfully moved to position (" + this.x + ", " + this.y + ").";
         }
         // daca am ajuns aici ori nu pot sa ma mut ori n am baterie

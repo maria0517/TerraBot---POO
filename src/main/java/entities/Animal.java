@@ -40,9 +40,8 @@ public abstract class Animal extends Entity {
     public int[] move(final MapA mapaCurenta, final int x, final int y) {
         // actually, pe asta o apelez pentru un animal scanat
         // fac eu astea din map
-        // aici o sa am un animal caruia ii voi gasi patratica pe care vrea sa se mute;
+        // aici o sa am un animal caruia ii voi gasi patratica pe care vrea sa se mute
         // mutarea efectiva e altceva
-        // asa, acum sa vad ce am
         double maxQualWater = -1;
         int xNew = 0;
         int yNew = 0;
@@ -63,8 +62,6 @@ public abstract class Animal extends Entity {
         if (mapaCurenta.verifCell(x + 1, y) && mapaCurenta.getCell(x + 1, y).getPlant() != null
                 && mapaCurenta.getCell(x + 1, y).getWater() != null && mapaCurenta.getCell(x + 1,
                 y).getScannedWater() && mapaCurenta.getCell(x + 1, y).getScannedPlant()) { // jos
-            // am si apa si planta undeva
-            // vad daca e maxim
             double apaScor = mapaCurenta.getCell(x + 1, y).getWater().waterQualityCalc();
             if (apaScor > maxQualWater) {
                 maxQualWater = apaScor;
@@ -76,8 +73,6 @@ public abstract class Animal extends Entity {
                 && mapaCurenta.getCell(x, y - 1).getWater() != null && mapaCurenta.getCell(x,
                 y - 1).getScannedWater() && mapaCurenta.getCell(x, y - 1).getScannedPlant()) {
             // stnaga
-            // am si apa si planta undeva
-            // vad daca e maxim
             double apaScor = mapaCurenta.getCell(x, y - 1).getWater().waterQualityCalc();
             if (apaScor > maxQualWater) {
                 maxQualWater = apaScor;
@@ -89,8 +84,6 @@ public abstract class Animal extends Entity {
                 && mapaCurenta.getCell(x - 1, y).getWater() != null && mapaCurenta.getCell(x - 1,
                 y).getScannedWater() && mapaCurenta.getCell(x - 1, y).getScannedPlant()) {
             // si aici sus
-            // am si apa si planta undeva
-            // vad daca e maxim
             double apaScor = mapaCurenta.getCell(x - 1, y).getWater().waterQualityCalc();
             if (apaScor > maxQualWater) {
                 maxQualWater = apaScor;

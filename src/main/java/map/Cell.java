@@ -95,7 +95,7 @@ public final class Cell {
      * metoda afisare env info
      */
     public ObjectNode getEnvironmentInfo(final boolean weatherChange) {
-        // fac mapper local ca ala din main e private (railor)
+        // fac mapper local ca ala din main e privat
         ObjectMapper localMapper = new ObjectMapper();
         ObjectNode cellInfo = localMapper.createObjectNode();
 
@@ -165,24 +165,17 @@ public final class Cell {
      * functie pentru aplicare improv
      */
     public void applyImprov(final String improvmentType) {
-        // Aplică îmbunătățirile corespunzătoare
+        // aplic imbunatatiri
         if (improvmentType.equals("plantVegetation")) {
-            // pentru planta -> o adaug in celula
-            //  this.plant = (Plant) elemToAdd;
-            // this.plant.setType(type);
-
             // cresc nivelul de oxigen
             this.air.setOxygenLevel(this.air.getOxygenLevel() + Const.O_TREIME);
         }
         if (improvmentType.equals("fertilizeSoil")) {
-            // aici la animal; eu efectiv il trantesc aici??
-            // ma mai gandesc
-            // asta se face sigur
             this.soil.setOrganicMatter(this.soil.getOrganicMatter() + Const.O_TREIME);
         }
         if (improvmentType.equals("increaseHumidity")
                 || improvmentType.equals("increaseMoisture")) {
-            // la apa -> adaug apa si modific ce e de mod
+            // la apa -> amodific dupa improv
             if (improvmentType.equals("increaseHumidity") && this.air != null) {
                 this.air.setHumidity(this.air.getHumidity() + Const.DOUA_ZECIMI);
             }

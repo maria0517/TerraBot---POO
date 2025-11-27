@@ -22,10 +22,6 @@ public final class DesertAir extends Air {
         }
     }
 
-    public boolean getDesertStormCheck() {
-        return desertStormCheck;
-    }
-
     @Override
     public double airQualityCalc() {
         double airQualBrute = (this.getOxygenLevel() * Const.UN_DOI) - (dustParticles

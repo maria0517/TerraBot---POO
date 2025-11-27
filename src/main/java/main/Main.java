@@ -96,47 +96,23 @@ public final class Main {
                     weatherChange = false;
                     // increm pentru urmatoarea simulare
                     counterSim++;
+                }
 
-                    // zona de debug maxim
-
-                    for (int i = 0; i < width; i++) {
-                        for (int j = 0; j < height; j++) {
-                            System.out.println("Celula (" + i + ", " + j + "):\n" + mapaCurenta.getCell(i, j) + "\n------------------------");
-                        }
+                // pentru debug
+                System.out.println("La timestamp: " + comanda.getTimestamp());
+                for (int i = 0; i < mapaCurenta.getWidth(); i++) {
+                    for (int j = 0; j < mapaCurenta.getWidth(); j++) {
+                        System.out.println("Celula (" + i + ", " + j + "):\n" + mapaCurenta.getCell(i, j) + "\n------------------------");
                     }
-
-                    for (int i = 0; i < width; i++) {
-                        for (int j = 0; j < height; j++) {
-                            System.out.println("Prob la celula " + i + " " + j);
-                            if (mapaCurenta.getCell(i, j).getAir() != null) {
-                                System.out.println(mapaCurenta.getCell(i, j).getAir().calculateToxicity());
-                            }
-                            if (mapaCurenta.getCell(i, j).getSoil() != null) {
-                                System.out.println(mapaCurenta.getCell(i, j).getSoil().blockProbability());
-                            }
-                            if (mapaCurenta.getCell(i, j).getPlant() != null) {
-                                System.out.println(mapaCurenta.getCell(i, j).getPlant().getAttackProb());
-                            }
-                            if  (mapaCurenta.getCell(i, j).getWater() != null) {
-                                System.out.println(mapaCurenta.getCell(i, j).getWater().waterQualityCalc());
-                            }
-                            if  (mapaCurenta.getCell(i, j).getAnimal() != null) {
-                                System.out.println(mapaCurenta.getCell(i, j).getAnimal().attackProbability());
-                            }
-
-                        }
-                    }
-
-                    // sfarsit zona debug masiv
                 }
                 if (beginSim) {
-                    // error - simularea a inceput deja
+                    // eroar - simularea a inceput deja
                     eroare.put("command", comanda.getCommand());
                     eroare.put("message",
                             "ERROR: Simulation already started. Cannot perform action");
                     eroare.put("timestamp", comanda.getTimestamp());
                     output.add(eroare);
-                    // trec peste ))
+                    // trec peste
                     continue;
                 }
                 // si a plecat pe bune
@@ -172,7 +148,7 @@ public final class Main {
                     // s a inchis ceva ce nu s a deschis))
                     eroare.putArray("ERROR: Simulation not started. Cannot perform action");
                     output.add(eroare);
-                    // trec peste ))
+
                     continue;
                 }
                 endSim = true;
@@ -190,7 +166,6 @@ public final class Main {
                 // mai intai "debifez true de la weathercond"
                 mapaCurenta.setWeatherCheck(weatherType, 0);
                 // recalc la toata lumea -> de fiecare cand fol aer calculez efectiv
-                // mapaCurenta.recalcAir(weatherType);
             }
             // dintr o simulare de a mea
             // fac toate interactiunile cu care sunt restanta
@@ -203,15 +178,12 @@ public final class Main {
                     mapaCurenta.intercAnimal(timestamp);
                 }
             }
-            // actualizez noul lastProcessed
+            // actualizez noul timp
             lastProcessedTimestamp = comanda.getTimestamp();
 
             // preiau comenzi daca nu a inceput o simulare
             // si daca robotelul nu este la incarcat
             if (beginSim && !endSim && !isCharging) {
-                // aici trebuie sa pun toate interact care se mod independent de orice
-                // le fac mai sus sus pentru toata lumea
-
                 // aici sunt in timpul simularii
                 if (comanda.getCommand().equals("printEnvConditions")) {
                     // patratica curenta -> data de coor robotel
@@ -238,7 +210,7 @@ public final class Main {
                 // urmeaza aici move_robot
                 if (comanda.getCommand().equals("moveRobot")) {
                     result.put("command", "moveRobot");
-                    // vad returneaza fie ca s a mutat fie ca nu
+                    // metoda returneaza fie ca s a mutat fie ca nu
                     String mutareRobot = amicu.moveRobot(mapaCurenta);
                     result.put("message", mutareRobot);
                     result.put("timestamp", comanda.getTimestamp());
@@ -263,17 +235,15 @@ public final class Main {
                     result.put("command", "rechargeBattery");
                     result.put("message", "Robot battery is charging.");
                     result.put("timestamp", comanda.getTimestamp());
-                    // dupa ce il afisez ii fac ++
-                    // timestamp = timestamp + timeToRecharge - 1; // increm la final de for comenzi
+                    // timestamp = timestamp + timeToRecharge - 1 atunci se opresc incarcarea
                     // de cand a inceput sa se incarce amicu
                     timeLoadStart = comanda.getTimestamp();
                     output.add(result);
                 }
                 if (comanda.getCommand().equals("changeWeatherConditions")) {
-                    // sa vad ce fac si aici -> nu sunt toate completate; le fac pe parcurs
                     // vremea pe care o citesc afecteaza intreaga matrice
                     weatherType = comanda.getType();
-                    // pentru a si atribui
+                    // pentru ce atribui
                     double value = 0;
 
                     // trebuie sa citesc ce val am (poate fi pentru mountain, rainfall, temperate)
@@ -349,7 +319,7 @@ public final class Main {
                                 Entity apaScan = mapaCurenta.getCell(amicu.getX(),
                                         amicu.getY()).getWater();
                                 amicu.addScanObj(apaScan);
-                                amicu.setEnergyPoints(amicu.getEnergyPoints() - 7);
+                                amicu.setEnergyPoints(amicu.getEnergyPoints() - Const.UN_SAPTE);
                                 // salvez cand am "constientizat" apa
                                 mapaCurenta.getCell(amicu.getX(), amicu.getY()).
                                         setStartInterWater(comanda.getTimestamp());
@@ -362,56 +332,60 @@ public final class Main {
                           }
 
                         }
-                        if (!color.equals("none") && !smell.equals("none") && sound.equals("none")) {
+                      if (!color.equals("none") && !smell.equals("none") && sound.equals("none")) {
                             // aici e plantuta
-                            // trebuie sa vad daca exista pe patratica robotului asta, daca nu eroare
-                            if (mapaCurenta.getCell(amicu.getX(), amicu.getY()).getPlant() == null) {
+                            // trebuie sa vad daca exista pe patratica robotului asta,
+                            // daca nu eroare
+                          if (mapaCurenta.getCell(amicu.getX(), amicu.getY()).getPlant() == null) {
                                 // nu am plantuta, e o mica problema
                                 eroare.put("command", comanda.getCommand());
-                                eroare.put("message", "ERROR: Object not found. Cannot perform action");
+                                eroare.put("message", "ERROR: Object not found."
+                                       + " Cannot perform action");
                                 eroare.put("timestamp", comanda.getTimestamp());
                                 output.add(eroare);
-                            } else {
+                          } else {
                                 // planta exista, trebuie adaugata in inventarul robotelului
-                                Entity plantutaScan = mapaCurenta.getCell(amicu.getX(), amicu.getY()).getPlant();
+                                Entity plantutaScan = mapaCurenta.getCell(amicu.getX(),
+                                        amicu.getY()).getPlant();
                                 amicu.addScanObj(plantutaScan);
                                 amicu.setEnergyPoints(amicu.getEnergyPoints() - Const.UN_SAPTE);
                                 // salvez cand a inceput plantuta respectiva sa "traiasca"
                                 mapaCurenta.getCell(amicu.getX(),
                                         amicu.getY()).setStartInterPlant(comanda.getTimestamp());
                                 // o pun si pe harta pentru interactiuni
-                                mapaCurenta.getCell(amicu.getX(), amicu.getY()).setScannedPlant(true);
+                                mapaCurenta.getCell(amicu.getX(),
+                                        amicu.getY()).setScannedPlant(true);
                                 result.put("command", "scanObject");
                                 result.put("message", "The scanned object is a plant.");
                                 result.put("timestamp", comanda.getTimestamp());
                                 output.add(result);
-                            }
-                        }
-                        if (!color.equals("none") && !smell.equals("none") && !sound.equals("none")) {
-                            // animal, not yet
-                            if (mapaCurenta.getCell(amicu.getX(), amicu.getY()).getAnimal() == null) {
-                                // alta data
+                          }
+                      }
+                     if (!color.equals("none") && !smell.equals("none") && !sound.equals("none")) {
+                         if (mapaCurenta.getCell(amicu.getX(), amicu.getY()).getAnimal() == null) {
                                 eroare.put("command", comanda.getCommand());
                                 eroare.put("message", "ERROR: Object not found. "
                                         + "Cannot perform action");
                                 eroare.put("timestamp", comanda.getTimestamp());
                                 output.add(eroare);
-                            } else {
+                         } else {
                                 // animal exista, trebuie adaugata in inventarul robotelului
-                                Entity animalScan = mapaCurenta.getCell(amicu.getX(), amicu.getY()).getAnimal();
+                                Entity animalScan = mapaCurenta.getCell(amicu.getX(),
+                                        amicu.getY()).getAnimal();
                                 amicu.addScanObj(animalScan);
-                                amicu.setEnergyPoints(amicu.getEnergyPoints() - 7);
+                                amicu.setEnergyPoints(amicu.getEnergyPoints() - Const.UN_SAPTE);
                                 // salvez cand a inceput plantuta respectiva sa "traiasca"
                                 mapaCurenta.getCell(amicu.getX(),
                                         amicu.getY()).setStartInterAnimal(comanda.getTimestamp());
                                 // o pun si pe harta pentru interactiuni
-                                mapaCurenta.getCell(amicu.getX(), amicu.getY()).setScannedAnimal(true);
+                                mapaCurenta.getCell(amicu.getX(),
+                                        amicu.getY()).setScannedAnimal(true);
                                 result.put("command", "scanObject");
                                 result.put("message", "The scanned object is an animal.");
                                 result.put("timestamp", comanda.getTimestamp());
                                 output.add(result);
-                            }
-                        }
+                         }
+                     }
                     }
                 }
                 if (comanda.getCommand().equals("learnFact")) {
@@ -419,7 +393,8 @@ public final class Main {
                     if (amicu.getEnergyPoints() < 2) {
                         // nu pot face miscarea
                         eroare.put("command", comanda.getCommand());
-                        eroare.put("message", "ERROR: Not enough battery left. Cannot perform action");
+                        eroare.put("message", "ERROR: Not enough battery left."
+                                + " Cannot perform action");
                         eroare.put("timestamp", comanda.getTimestamp());
                         output.add(eroare);
                     } else {
@@ -428,15 +403,15 @@ public final class Main {
 
                         boolean gasit = false;
                         for (Entity e : amicu.getScannedEntities()) {
-                            if (e.getName().equals(component))
+                            if (e.getName().equals(component)) {
                                 gasit = true;
-
+                            }
                         }
                         if (!gasit) {
                             // n am scanat inca elem pe care vreau sa l pun
-                            // eroare
                             eroare.put("command", comanda.getCommand());
-                            eroare.put("message", "ERROR: Subject not yet saved. Cannot perform action");
+                            eroare.put("message", "ERROR: Subject not yet saved."
+                                    + " Cannot perform action");
                             eroare.put("timestamp", comanda.getTimestamp());
                             output.add(eroare);
                         } else {
@@ -446,7 +421,8 @@ public final class Main {
                             // scad punctele de energie
                             amicu.setEnergyPoints(amicu.getEnergyPoints() - 2);
                             result.put("command", comanda.getCommand());
-                            result.put("message", "The fact has been successfully saved in the database.");
+                            result.put("message", "The fact has been"
+                                    + " successfully saved in the database.");
                             result.put("timestamp", comanda.getTimestamp());
                             output.add(result);
                         }
@@ -454,8 +430,9 @@ public final class Main {
                 }
                 if (comanda.getCommand().equals("improveEnvironment")) {
                     eroare.put("command", comanda.getCommand());
-                    if (amicu.getEnergyPoints() < 10) {
-                        eroare.put("message", "ERROR: Not enough battery left. Cannot perform action");
+                    if (amicu.getEnergyPoints() < Const.UN_ZECE) {
+                        eroare.put("message", "ERROR: Not enough battery left. "
+                                + "Cannot perform action");
                         eroare.put("timestamp", comanda.getTimestamp());
                         output.add(eroare);
                     } else {
@@ -475,7 +452,8 @@ public final class Main {
                         }
                         // daca n am gasit elem in cele scanate -> dau eroare
                         if (!gasit) {
-                            eroare.put("message", "ERROR: Subject not yet saved. Cannot perform action");
+                            eroare.put("message", "ERROR: Subject not yet saved. "
+                                    + "Cannot perform action");
                             eroare.put("timestamp", comanda.getTimestamp());
                             output.add(eroare);
                         } else {
@@ -495,52 +473,58 @@ public final class Main {
                                 case "increaseMoisture":
                                     requiredFact = "Method to increaseMoisture";
                                     break;
+                                default:
+                                    break;
                             }
 
                             boolean factGasit = false;
                             // acum ca am formatul cerut, incep sa caut
-                            // Parcurge toate faptele din baza de date
+                            // parcurg toate faptele din baza de date
                             List<String> factsForSubject = amicu.getFacts(elemToAdd);
                             if (factsForSubject != null) {
                                 for (String fact : factsForSubject) {
-                                    if (fact.equals(requiredFact))
+                                    if (fact.equals(requiredFact)) {
                                         factGasit = true;
+                                    }
                                 }
                             }
 
                             if (!factGasit) {
                                 // n am gasit facts pentru jucarie
-                                // eroare
-                                eroare.put("message", "ERROR: Fact not yet saved. Cannot perform action");
+                                eroare.put("message", "ERROR: Fact not yet saved. "
+                                        + "Cannot perform action");
                                 eroare.put("timestamp", comanda.getTimestamp());
                                 output.add(eroare);
                             } else {
-                                // am tot ce trebuie
-                                // scad energia
-                                amicu.setEnergyPoints(amicu.getEnergyPoints() - 10);
+                                // am tot ce trebuie -> scad energia
+                                amicu.setEnergyPoints(amicu.getEnergyPoints() - Const.UN_ZECE);
 
-                                // dau mesajul
+                                // dau mesaj
                                 result.put("command", comanda.getCommand());
-                                // aici mai adaug in functie de teste
+
                                 if (improvementType.equals("plantVegetation")) {
-                                    result.put("message", "The " + elemToAdd + " was planted successfully.");
+                                    result.put("message", "The " + elemToAdd
+                                            + " was planted successfully.");
                                 }
                                 if (improvementType.equals("fertilizeSoil")) {
-                                    result.put("message", "The soil was successfully fertilized using "+ elemToAdd);
+                                    result.put("message", "The soil was"
+                                            + " successfully fertilized using " + elemToAdd);
                                 }
                                 if (improvementType.equals("increaseHumidity")) {
-                                    result.put("message", "The humidity was successfully increased using " + elemToAdd);
+                                    result.put("message", "The humidity was"
+                                            + " successfully increased using " + elemToAdd);
                                 }
                                 if (improvementType.equals("increaseMoisture")) {
                                     // asta e mai cu mot, nu vrea punct la final
-                                    result.put("message", "The moisture was successfully increased using " + elemToAdd);
+                                    result.put("message", "The moisture was"
+                                            + " successfully increased using " + elemToAdd);
                                 }
                                 result.put("timestamp", comanda.getTimestamp());
                                 output.add(result);
 
-                                // aici imbunatatirea; urmeaza
                                 // o fac fix in celula respectiva
-                                mapaCurenta.getCell(amicu.getX(), amicu.getY()).applyImprov(improvementType);
+                                mapaCurenta.getCell(amicu.getX(),
+                                        amicu.getY()).applyImprov(improvementType);
                                 // sterg elementul pe care l am folosit din inventarul robotului
                                 amicu.getScannedEntities().remove(entityToAdd);
                             }
@@ -575,16 +559,14 @@ public final class Main {
                 // aici mi se incarca jucaria si nu pot inchide simularea
                 if (isCharging && comanda.getCommand().equals("endSimulation")) {
                     // vreau sa inchid si amicu se incarca
-                    // error
                     eroare.put("command", comanda.getCommand());
                     eroare.put("message", "ERROR: Robot still charging. Cannot perform action");
                     eroare.put("timestamp", comanda.getTimestamp());
                     output.add(eroare);
                 }
                 if (isCharging) {
-                    // orice com am primit nu o pot exec
+                    // orice comanda am primit nu o pot exec
                     // robotul e la incarcat
-                    // daca n am noroc se va afisa eroare
                     eroare.put("command", comanda.getCommand());
                     eroare.put("message", "ERROR: Robot still charging. Cannot perform action");
                     eroare.put("timestamp", comanda.getTimestamp());
@@ -592,7 +574,6 @@ public final class Main {
 
                 }
             }
-            // timestamp++;
         }
         File outputFile = new File(outputPath);
         outputFile.getParentFile().mkdirs();
