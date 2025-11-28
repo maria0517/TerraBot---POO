@@ -9,7 +9,9 @@ import fileio.CommandInput;
 import fileio.InputLoader;
 import fileio.SimulationInput;
 
-import map.*;
+import map.Robot;
+import map.MapA;
+import map.Cell;
 import entities.*;
 
 import java.io.File;
@@ -96,14 +98,6 @@ public final class Main {
                     weatherChange = false;
                     // increm pentru urmatoarea simulare
                     counterSim++;
-                }
-
-                // pentru debug
-                System.out.println("La timestamp: " + comanda.getTimestamp());
-                for (int i = 0; i < mapaCurenta.getWidth(); i++) {
-                    for (int j = 0; j < mapaCurenta.getWidth(); j++) {
-                        System.out.println("Celula (" + i + ", " + j + "):\n" + mapaCurenta.getCell(i, j) + "\n------------------------");
-                    }
                 }
                 if (beginSim) {
                     // eroar - simularea a inceput deja
@@ -324,7 +318,8 @@ public final class Main {
                                 mapaCurenta.getCell(amicu.getX(), amicu.getY()).
                                         setStartInterWater(comanda.getTimestamp());
                                 // o pun si ca scanata
-                             mapaCurenta.getCell(amicu.getX(), amicu.getY()).setScannedWater(true);
+                                mapaCurenta.getCell(amicu.getX(),
+                                        amicu.getY()).setScannedWater(true);
                                 result.put("command", "scanObject");
                                 result.put("message", "The scanned object is water.");
                                 result.put("timestamp", comanda.getTimestamp());
@@ -332,18 +327,20 @@ public final class Main {
                           }
 
                         }
-                      if (!color.equals("none") && !smell.equals("none") && sound.equals("none")) {
+                        if (!color.equals("none") && !smell.equals("none")
+                                && sound.equals("none")) {
                             // aici e plantuta
                             // trebuie sa vad daca exista pe patratica robotului asta,
                             // daca nu eroare
-                          if (mapaCurenta.getCell(amicu.getX(), amicu.getY()).getPlant() == null) {
+                            if (mapaCurenta.getCell(amicu.getX(),
+                                    amicu.getY()).getPlant() == null) {
                                 // nu am plantuta, e o mica problema
                                 eroare.put("command", comanda.getCommand());
                                 eroare.put("message", "ERROR: Object not found."
-                                       + " Cannot perform action");
+                                        + " Cannot perform action");
                                 eroare.put("timestamp", comanda.getTimestamp());
                                 output.add(eroare);
-                          } else {
+                            } else {
                                 // planta exista, trebuie adaugata in inventarul robotelului
                                 Entity plantutaScan = mapaCurenta.getCell(amicu.getX(),
                                         amicu.getY()).getPlant();
@@ -359,16 +356,18 @@ public final class Main {
                                 result.put("message", "The scanned object is a plant.");
                                 result.put("timestamp", comanda.getTimestamp());
                                 output.add(result);
-                          }
-                      }
-                     if (!color.equals("none") && !smell.equals("none") && !sound.equals("none")) {
-                         if (mapaCurenta.getCell(amicu.getX(), amicu.getY()).getAnimal() == null) {
+                            }
+                        }
+                        if (!color.equals("none") && !smell.equals("none")
+                                && !sound.equals("none")) {
+                            if (mapaCurenta.getCell(amicu.getX(),
+                                    amicu.getY()).getAnimal() == null) {
                                 eroare.put("command", comanda.getCommand());
                                 eroare.put("message", "ERROR: Object not found. "
                                         + "Cannot perform action");
                                 eroare.put("timestamp", comanda.getTimestamp());
                                 output.add(eroare);
-                         } else {
+                            } else {
                                 // animal exista, trebuie adaugata in inventarul robotelului
                                 Entity animalScan = mapaCurenta.getCell(amicu.getX(),
                                         amicu.getY()).getAnimal();
@@ -384,8 +383,8 @@ public final class Main {
                                 result.put("message", "The scanned object is an animal.");
                                 result.put("timestamp", comanda.getTimestamp());
                                 output.add(result);
-                         }
-                     }
+                            }
+                        }
                     }
                 }
                 if (comanda.getCommand().equals("learnFact")) {

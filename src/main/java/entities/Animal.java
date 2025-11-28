@@ -157,6 +157,9 @@ public abstract class Animal extends Entity {
                 return new int[]{xNew, yNew};
             } else {
                 // ajung sa le caut pe bucatele ca la robot
+                if (mapaCurenta.verifCell(x - 1, y)) {
+                    return new int[]{x - 1, y};
+                }
                 if (mapaCurenta.verifCell(x, y + 1)) {
                     return new int[]{x, y + 1};
                 }
@@ -165,9 +168,6 @@ public abstract class Animal extends Entity {
                 }
                 if (mapaCurenta.verifCell(x, y - 1)) {
                     return new int[]{x, y - 1};
-                }
-                if (mapaCurenta.verifCell(x - 1, y)) {
-                    return new int[]{x - 1, y};
                 }
             }
         }

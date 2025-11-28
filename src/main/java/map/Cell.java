@@ -278,16 +278,4 @@ public final class Cell {
     public void setStartInterAnimal(final int startInterAnimal) {
         this.startInterAnimal = startInterAnimal;
     }
-
-    // pentru debug
-    @Override
-    public String toString() {
-        return "Cell:\n" +
-                "  Plant : " + plant + " daca e scan: " + getScannedPlant() + "\n" +
-                "  Animal: " + animal + "daca e scan "+ getScannedAnimal() + "\n" +
-                "  Soil  : " + soil + "\n" +
-                "  Water : " + water + " daca e scan "+ getScannedAnimal() + "\n" +
-                "  Air   : " + air;
-    }
-
 }

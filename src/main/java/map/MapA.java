@@ -530,9 +530,7 @@ public final class MapA {
                     // aici trebuie sa l mut si sa l fac sa manance
                     int[] newCoords = mapaEfec[i][j].getAnimal().move(this, i, j);
                     int preyEaten = 0;
-                    System.out.println("animalul x: " + mapaEfec[i][j].getAnimal().getName() +
-                            " trebuie mutat de la " + i + " " + j + " la " + newCoords[0] + " " + newCoords[1] +
-                            " cand l am miscat: " + timestampCurent);
+
                     // acum am unde trebuie sa l mut, luat dupa celelalte criterii
                     // trebuie sa incep sa verific care e treaba cu patratica pe care
                     // ma duc sa vad daca am animal de tip carnivor / parazit

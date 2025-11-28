@@ -48,7 +48,7 @@ public final class TemperateAir extends Air {
         double airQualBrute = (this.getOxygenLevel() * Const.UN_DOI)
                 + (this.getHumidity() * Const.ZERO_SAPTE) - (pollenLevel * Const.O_ZECIME);
         airQualBrute = Math.max(0, Math.min(Const.O_SUTA_DBL, airQualBrute));
-        if (newSeasoncheck) {
+        if (newSeasoncheck && season != null) {
             // adaug
             double seasonPenalty = season.equalsIgnoreCase("Spring") ? Const.FOR_SPRING : 0;
             airQualBrute = airQualBrute - seasonPenalty;
