@@ -111,11 +111,10 @@ public final class Main {
                 }
                 // si a plecat pe bune
                 beginSim = true;
-                ObjectNode eBine = MAPPER.createObjectNode();
-                eBine.put("command", "startSimulation");
-                eBine.put("message", "Simulation has started.");
-                eBine.put("timestamp", comanda.getTimestamp());
-                output.add(eBine);
+                result.put("command", "startSimulation");
+                result.put("message", "Simulation has started.");
+                result.put("timestamp", comanda.getTimestamp());
+                output.add(result);
             }
 
             //  asta e pentru comenzile dintre endSim si startSim
@@ -142,15 +141,13 @@ public final class Main {
                     // s a inchis ceva ce nu s a deschis))
                     eroare.putArray("ERROR: Simulation not started. Cannot perform action");
                     output.add(eroare);
-
                     continue;
                 }
                 endSim = true;
-                ObjectNode eBine = MAPPER.createObjectNode();
-                eBine.put("command", "endSimulation");
-                eBine.put("message", "Simulation has ended.");
-                eBine.put("timestamp", comanda.getTimestamp());
-                output.add(eBine);
+                result.put("command", "endSimulation");
+                result.put("message", "Simulation has ended.");
+                result.put("timestamp", comanda.getTimestamp());
+                output.add(result);
             }
 
             // pentru schimbari meteo
