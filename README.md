@@ -7,42 +7,55 @@
 #### Assignment Link: [https://ocw.cs.pub.ro/courses/poo-ca-cd/teme/tema](https://ocw.cs.pub.ro/courses/poo-ca-cd/teme/tema)
 
 
-## Skel Structure
+## 1. Descriere Generală
 
-* src/
-    * checker/ - checker files
-    * fileio/ - contains classes used to read data from the json files
-    * main/
-        * Main - the Main class runs the checker on your implementation. Add the entry point to your implementation in it. Run Main to test your implementation from the IDE or from command line.
-        * Test - run the main method from Test class with the name of the input file from the command line and the result will be written
-          to the out.txt file. Thus, you can compare this result with ref.
-* input/ - contains the tests in JSON format
-* ref/ - contains all reference output for the tests in JSON format
+Tema implementează un simulator complet al unui ecosistem dinamic dispus pe o matrice 2D, populat cu entități diverse (plante, animale, sol, aer, apă) și un robot autonom de explorare (**TerraBot**) care navighează, scanează și influențează direct mediul.
 
-## Tests
+În `main`, am păstrat doar logica de citire și parsare a comenzilor din fișierele JSON de intrare:
+* **Gestiune Simulări:** Am implementat un contor dedicat pentru numărul de simulări. Fiecare sesiune este delimitată strict de comenzile `startSimulation` și `endSimulation`. Orice comandă primită în afara acestui interval este ignorată automat.
+* **Popularea Hărții:** Matricea de celule este inițializată și umplută cu entități prin metoda `populMap`, după care se începe procesarea evenimentelor conform stadiului curent al simulării.
 
-1. test01_initialize_entities 3p
-2. test02_initialize_entities_errors - 2p
-3. test03__move_robot - 5p
-4. test04_move_robot_errors – 2p
-5. test05_env_condition - 2p
-6. test06_update_battery - 3p
-7. test07_update_battery_errors 2p
-8. test08_change_weather - 3p
-9. test09_scan_plant 3p
-10. test10_scan_water 5p
-11. test11_scan_animal - 6p
-12. test12_scan_object_errors – 2p
-13. test13_learn_fact - 4p
-14. test14_improve_environment - 5p
-15. test15_improve_environment_errors – 2p
-16. test16_mid - 6p
-17. test17_multiple_simulations - 3p
-18. test18_multiple_simulations_error - 2p
-19. test19_complex_simple - 6p
-20. test20_complex_errors - 6p
-21. test21_complex_combined - 8p
+---
 
+## 2. Ierarhia de Clase și Structura Entităților
 
+Toate entitățile sunt modularizate în pachetul `entities`, aplicând principii solide de OOP și polimorfism:
+* **`Entity` (clasa de bază abstractă):** Moștenită de clasele abstracte principale: `Plant`, `Animal`, `Soil`, `Air` și `Water`.
+* **Subclase Specifice:** Fiecare tip concret de entitate extinde clasa abstractă corespunzătoare, având atribute și comportamente proprii.
+* **Polimorfism și Calcul Scor:** Clasele derivate implementează metodele specifice de calcul al probabilităților (șanse de blocare, avariere a robotului etc.), în timp ce clasele părinte definesc semnăturile metodelor și logica generică de calcul a scorului de calitate.
+* **Matricea Hărții (`MapA`):** Conține o matrice de obiecte de tip `Cell` (fiecare celulă gestionând tipurile de entități prezente) și metodele specifice: `populMap`, `printMapInfo` și mecanismele de interacțiune.
 
-<div align="center"><img src="https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExeWt2djVodmJsc3E1c2RqdWc3emV4aGU5OWVrd2g5ZDFvNHdnOHY1MSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/HTCp5FBZ3vEXLDoNOm/giphy.gif" width="500px"></div>
+---
+
+## 3. Sistemul de Interacțiuni din Mediu
+
+Interacțiunile sunt orchestrate în 3 categorii mari, executate cronologic la fiecare pas de simulare:
+1. **Interacțiuni de 1 Timestamp:** Tratează relațiile și schimburile dintre plante, sol și aer.
+2. **Interacțiuni de 2 Timestamps:** Gestionează dinamica surselor și masei de apă.
+3. **Interacțiunile Animalelor (Mișcare și Hrană):**
+   * Fiecare celulă utilizează flag-uri booleene (de tipul `scannedX`) pentru a stabili dacă o entitate a fost scanată și dacă are dreptul să inițieze interacțiuni.
+   * Clasa `Animal` deține o metodă de căutare a celei mai bune celule adiacente pe baza cerințelor din enunț.
+   * Dacă animalul este de tip carnivor sau parazit, acesta poate consuma animalul din celula destinație (indiferent dacă victima este scanată sau nu).
+   * Pentru hrănire, se verifică dacă resursele (plante, apă) sunt scanate, iar acțiunile alterează starea hărții (scăderea masei de apă, eliminarea plantelor, îmbunătățirea solului).
+   * După deplasare, animalul este marcat ca fiind blocat pentru restul timestamp-ului curent printr-un flag boolean.
+
+---
+
+## 4. Logica Robotului (TerraBot)
+
+Robotul gestionează starea internă, inventarul și resursele energetice prin metode dedicate:
+* **Deplasare și Pathfinding (`moveRobot`):**
+  * Robotul se deplasează pe celula vecină cu cel mai mare scor de calitate (calculat polimorfic combinând riscurile plantelor, atacurile animalelor, aerul și terenul).
+  * Ordinea de verificare a vecinilor respectă direcțiile: **dreapta, jos, stânga, sus** (rezolvând orientarea axelor pe grid).
+* **Managementul Energiei:** Fiecare deplasare, scanare sau acțiune consumă baterie. Dacă nivelul este insuficient, acțiunile robotului sunt blocate până la executarea comenzii `rechargeBattery`.
+* **Colecții de Date:**
+  * **Obiecte Scanate:** Am folosit un `ArrayList` pentru flexibilitate la inserarea și eliminarea resurselor din inventar.
+  * **Facts:** Am utilizat un `LinkedHashMap` pentru a păstra ordinea exactă de inserare a faptelor învățate, esențială pentru afișarea corectă.
+  * **`improve_environment`:** În urma reabilitării unei celule, elementul consumat este extras și șters din inventarul robotului.
+
+---
+
+## 5. Provocări Întâmpinate și Rafinamente
+
+* **Schimbări Climatice (`changeWeather`):** Când condițiile meteorologice se modifică și este necesară afișarea unui atribut alternativ (ex. `DustParticles` $\to$ `DesertStorm`), am introdus o metodă abstractă `extraDisp` care returnează dinamic reprezentarea corectă în funcție de flag-ul de vreme activ.
+* **Checkstyle & Magic Numbers:** Pentru a elimina avertismentele de stil legate de constante hardcodate, am cr
